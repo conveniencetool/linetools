@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINEで使える便利ツール集 - 試験版 -</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;  /* 背景を黒に */
+            color: #fff;             /* 文字色を白に */
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .title {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            font-size: 16px;
+            font-style: italic;
+            color: #bbb;             /* サブタイトルの色 */
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;      /* コンテナを中央寄せ */
+            padding: 20px;
+            background-color: #222;  /* コンテナの背景色を濃いグレーに */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* 薄い白の影を追加 */
+        }
+        input[type="text"], input[type="file"], input[type="datetime-local"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px 0;
+            border: 1px solid #555;  /* 枠線を少し明るめのグレーに */
+            border-radius: 4px;
+            background-color: #444;   /* 入力フィールドの背景色をさらに濃く */
+            color: #fff;              /* 入力フィールドの文字色を白に */
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #555;   /* ボタンの背景色 */
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #777;   /* ホバー時の色 */
+        }
+        .link-output {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #1e90ff;           /* リンクの色 */
+        }
+        .link-output a {
+            color: #1e90ff;           /* リンクの色を指定 */
+            text-decoration: none;     /* 下線を消す */
+        }
+        #qrcode {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="title">LINEで使える便利ツール集 - 試験版 -</h1>
+    <p class="subtitle">※使用は自己責任でお願いします。</p>
+    
+    <h2>LINEで使えるテキスト共有ツール</h2>
+    <p>文字を入力して、LINEで共有できるリンクを生成しましょう。</p>
+    <input type="text" id="textInput" placeholder="ここにテキストを入力" />
+    <button onclick="generateLineLink()">LINEリンク生成</button>
+    <div class="link-output" id="linkOutput"></div>
+    <div id="qrcode"></div>
+
+    <h2>LINEで使える画像共有ツール</h2>
+    <p>画像をアップロードして、LINEで共有できるリンクを生成しましょう。</p>
+    <input type="file" id="imageInput" accept="image/*" />
+    <button onclick="generateImageLink()">画像リンク生成</button>
+    <div class="link-output" id="imageLinkOutput"></div>
+
+    <h2>LINEで位置情報共有ツール</h2>
+    <p>現在地をLINEで共有するリンクを生成します。</p>
+    <button onclick="generateLocationLink()">位置情報リンク生成</button>
+    <div class="link-output" id="locationOutput"></div>
+
+    <h2>LINEでカウントダウンタイマー</h2>
+    <p>日時を設定して、LINEでカウントダウンを共有しましょう。</p>
+    <input type="datetime-local" id="countdownInput" />
+    <button onclick="generateCountdownLink()">カウントダウンリンク生成</button>
+    <div class="link-output" id="countdownOutput"></div>
+
+    <h2>LINEでメモ共有ツール</h2>
+    <p>簡単なメモを入力して、LINEで共有できるリンクを生成しましょう。</p>
+    <input type="text" id="memoInput" placeholder="ここにメモを入力" />
+    <button onclick="generateMemoLink()">メモリンク生成</button>
+    <div class="link-output" id="memoOutput"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+<script>
+    function generateLineLink() {
+        const text = document.getElementById('textInput').value;
+        if (text.trim() === '') {
+            alert('テキストを入力してください');
+            return;
+        }
+        
+        const encodedText = encodeURIComponent(text);
+        const lineShareUrl = `https://line.me/R/msg/text/?${encodedText}`;
+
+        const linkOutput = document.getElementById('linkOutput');
+        linkOutput.innerHTML = `LINEで共有するリンク: <a href="${lineShareUrl}" target="_blank">${lineShareUrl}</a>`;
+        
+        $('#qrcode').empty(); // QRコードのエリアをクリア
+        $('#qrcode').qrcode({
+            text: lineShareUrl,
+            width: 128,
+            height: 128
+        });
+    }
+
+    function generateImageLink() {
+        const imageInput = document.getElementById('imageInput');
+        if (imageInput.files.length === 0) {
+            alert('画像をアップロードしてください');
+            return;
+        }
+        
+        const file = imageInput.files[0];
+        const reader = new FileReader();
+
+        reader.onloadend = function() {
+            const base64Image = reader.result;
+            const imageLink = `https://line.me/R/msg/image/?${encodeURIComponent(base64Image)}`;
+            const imageLinkOutput = document.getElementById('imageLinkOutput');
+            imageLinkOutput.innerHTML = `LINEで共有する画像リンク: <a href="${imageLink}" target="_blank">${imageLink}</a>`;
+        };
+
+        reader.readAsDataURL(file); // 画像をBase64に変換
+    }
+
+    function generateLocationLink() {
+        // 緯度と経度を指定
+        const latitude = 35.681236;  // 例: 東京駅
+        const longitude = 139.767125;
+
+        const locationUrl = `https://line.me/R/msg/location/${latitude}/${longitude}`;
+        const locationOutput = document.getElementById('locationOutput');
+        locationOutput.innerHTML = `LINEで共有する位置情報リンク: <a href="${locationUrl}" target="_blank">${locationUrl}</a>`;
+    }
+
+    function generateCountdownLink() {
+        const countdownInput = document.getElementById('countdownInput').value;
+        if (countdownInput === '') {
+            alert('日時を入力してください');
+            return;
+        }
+
+        const countdownUrl = `https://line.me/R/msg/text/?${encodeURIComponent("カウントダウン: " + countdownInput)}`;
+        const countdownOutput = document.getElementById('countdownOutput');
+        countdownOutput.innerHTML = `LINEで共有するカウントダウンリンク: <a href="${countdownUrl}" target="_blank">${countdownUrl}</a>`;
+    }
+
+    function generateMemoLink() {
+        const memo = document.getElementById('memoInput').value;
+        if (memo.trim() === '') {
+            alert('メモを入力してください');
+            return;
+        }
+
+        const memoUrl = `https://line.me/R/msg/text/?${encodeURIComponent("メモ: " + memo)}`;
+        const memoOutput = document.getElementById('memoOutput');
+        memoOutput.innerHTML = `LINEで共有するメモリンク: <a href="${memoUrl}" target="_blank">${memoUrl}</a>`;
+    }
+</script>
+
+</body>
+</html>
